@@ -16162,6 +16162,13 @@ function Payments() {
     password
   });
   const navigate = useNavigate();
+  const inputSections = [
+    { type: INPUT_TYPE.password, visible: visible.password },
+    { type: INPUT_TYPE.cvcNumber, visible: visible.cvcNumber },
+    { type: INPUT_TYPE.expirationPeriod, visible: visible.expirationPeriod },
+    { type: INPUT_TYPE.cardBrand, visible: visible.cardBrand },
+    { type: INPUT_TYPE.cardNumbers, visible: true }
+  ];
   const isButtonShowing = reactExports.useMemo(() => {
     const isAllComplete = Object.values(cardNumbers).every(
       (num) => num.length === MAGIC_NUMBER.maxLength.cardNumber
@@ -16178,55 +16185,13 @@ function Payments() {
     return isAllComplete && isAllErrorFree;
   }, [cardNumbers, cardBrand, expirationPeriod, cvcNumber, password, error]);
   const handleClick = () => {
-    navigate("/success", {
-      state: {
-        cardNumber: `${cardNumbers.first}`,
-        cardBrand: `${cardBrand}`
-      }
-    });
+    navigate("/success");
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(PaymentsCSS, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Preview, {}),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { children: [
-      visible.password && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        InputSection,
-        {
-          type: INPUT_TYPE.password,
-          error,
-          validators
-        }
-      ),
-      visible.cvcNumber && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        InputSection,
-        {
-          type: INPUT_TYPE.cvcNumber,
-          error,
-          validators
-        }
-      ),
-      visible.expirationPeriod && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        InputSection,
-        {
-          type: INPUT_TYPE.expirationPeriod,
-          error,
-          validators
-        }
-      ),
-      visible.cardBrand && /* @__PURE__ */ jsxRuntimeExports.jsx(
-        InputSection,
-        {
-          type: INPUT_TYPE.cardBrand,
-          error,
-          validators
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(
-        InputSection,
-        {
-          type: INPUT_TYPE.cardNumbers,
-          error,
-          validators
-        }
+      inputSections.map(
+        ({ type, visible: visible2 }) => visible2 && /* @__PURE__ */ jsxRuntimeExports.jsx(InputSection, { type, error, validators })
       ),
       isButtonShowing && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleClick, variant: "home" })
     ] })
@@ -16272,9 +16237,7 @@ const SuccessTextCSS = dt.div`
 `;
 const check = "/react-payments/check.svg";
 function Success() {
-  const { resetCard } = useCard();
-  const location = useLocation();
-  const { cardNumber, cardBrand } = location.state || {};
+  const { resetCard, cardNumbers, cardBrand } = useCard();
   const navigate = useNavigate();
   const handleClick = () => {
     resetCard();
@@ -16284,7 +16247,7 @@ function Success() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(SuccessImgCSS, { src: check }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs(SuccessTextCSS, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
-        cardNumber,
+        cardNumbers.first,
         "로 시작하는"
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { children: [
