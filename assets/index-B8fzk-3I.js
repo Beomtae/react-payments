@@ -12135,6 +12135,164 @@ const CARD_BRAND_COLORS = {
   하나카드: "#009490",
   국민카드: "#6A6056"
 };
+const defaultError = {
+  cardNumbers: {
+    first: null,
+    second: null,
+    third: null,
+    fourth: null
+  },
+  expirationPeriod: {
+    month: null,
+    year: null
+  },
+  cvcNumber: null,
+  cardBrand: null,
+  password: null
+};
+const isInteger = (value) => Number.isInteger(Number(value));
+const isPositive = (value) => Number(value) >= 0;
+const isValidMonth = (value) => {
+  const num = Number(value);
+  return num >= 1 && num <= 12;
+};
+const isValidYear = (value) => {
+  const num = Number(value);
+  return num >= 25 && num <= 99;
+};
+function useInputError() {
+  const [error, setError] = reactExports.useState(defaultError);
+  const validateNumber = (value) => {
+    if (!isInteger(value)) return "숫자만 입력할 수 있습니다.";
+    if (!isPositive(value)) return "0 이상의 값을 입력해야 합니다.";
+    return null;
+  };
+  const validateCardNumber = (value, position2) => {
+    const message = validateNumber(value);
+    setError((prev2) => ({
+      ...prev2,
+      cardNumbers: {
+        ...prev2.cardNumbers,
+        [position2]: message
+      }
+    }));
+  };
+  const validateExpirationPeriod = (value, position2) => {
+    let message = validateNumber(value);
+    if (!message) {
+      if (position2 === "month" && !isValidMonth(value)) {
+        message = "1~12 사이의 월을 입력하세요.";
+      }
+      if (position2 === "year" && !isValidYear(value)) {
+        message = "25~99 사이의 연도를 입력하세요.";
+      }
+    }
+    setError((prev2) => ({
+      ...prev2,
+      expirationPeriod: {
+        ...prev2.expirationPeriod,
+        [position2]: message
+      }
+    }));
+  };
+  const validateCvcNumber = (value) => {
+    const message = validateNumber(value);
+    setError((prev2) => ({
+      ...prev2,
+      cvcNumber: message
+    }));
+  };
+  const validatePassword = (value) => {
+    const message = validateNumber(value);
+    setError((prev2) => ({
+      ...prev2,
+      password: message
+    }));
+  };
+  return {
+    error,
+    validators: {
+      validateCardNumber,
+      validateExpirationPeriod,
+      validateCvcNumber,
+      validatePassword
+    }
+  };
+}
+const defaultCardNumbers = {
+  first: "",
+  second: "",
+  third: "",
+  fourth: ""
+};
+const defaultExpirationPeriod = {
+  month: "",
+  year: ""
+};
+const defaultCvcNumber = "";
+const defaultCardBrand = "";
+const defaultPassword = "";
+const CardContext = reactExports.createContext(null);
+function CardProvider({ children }) {
+  const [cardNumbers, setCardNumbers] = reactExports.useState(defaultCardNumbers);
+  const [expirationPeriod, setExpirationPeriod] = reactExports.useState(
+    defaultExpirationPeriod
+  );
+  const [cvcNumber, setCvcNumber] = reactExports.useState(defaultCvcNumber);
+  const [cardBrand, setCardBrand] = reactExports.useState(defaultCardBrand);
+  const [password, setPassword] = reactExports.useState(defaultPassword);
+  const resetCard = () => {
+    setCardNumbers(defaultCardNumbers);
+    setCardBrand("");
+    setExpirationPeriod(defaultExpirationPeriod);
+    setCvcNumber("");
+    setPassword("");
+  };
+  const updateCardNumber = (value, position2) => {
+    setCardNumbers((prevNumbers) => ({
+      ...prevNumbers,
+      [position2]: value
+    }));
+  };
+  const updateExpirationPeriod = (value, position2) => {
+    setExpirationPeriod((prevExpirationPeriod) => ({
+      ...prevExpirationPeriod,
+      [position2]: value
+    }));
+  };
+  const updateCardBrand = (value) => {
+    setCardBrand(value);
+  };
+  const updatePassword = (value) => {
+    setPassword(value);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    CardContext.Provider,
+    {
+      value: {
+        cardNumbers,
+        updateCardNumber,
+        expirationPeriod,
+        updateExpirationPeriod,
+        cvcNumber,
+        updateCvcNumber: setCvcNumber,
+        cardBrand,
+        updateCardBrand,
+        password,
+        updatePassword,
+        resetCard
+      },
+      children
+    }
+  );
+}
+const useCard = () => {
+  const context = reactExports.useContext(CardContext);
+  if (context === null) {
+    throw new Error("CardContext must be used within a CardProvider");
+  }
+  return context;
+};
 var __assign = function() {
   __assign = Object.assign || function __assign2(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -13275,599 +13433,6 @@ var pt = function(e2) {
 A.forEach(function(e2) {
   dt[e2] = pt(e2);
 });
-const DescriptionCSS = dt.p`
-  font-size: ${({ theme: theme2 }) => theme2.fontSize.small};
-  color: ${({ theme: theme2 }) => theme2.colors.gray};
-  margin: 0;
-  padding: 10px 0;
-`;
-function Description({ description }) {
-  return description !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(DescriptionCSS, { children: description });
-}
-const ErrorCSS = dt.p`
-  font-size: ${({ theme: theme2 }) => theme2.fontSize.small};
-  color: ${({ theme: theme2 }) => theme2.colors.red};
-`;
-function Error$1({ errorMessage }) {
-  return errorMessage !== "" && /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorCSS, { children: errorMessage });
-}
-const defaultCardNumbers = {
-  first: "",
-  second: "",
-  third: "",
-  fourth: ""
-};
-const defaultExpirationPeriod = {
-  month: "",
-  year: ""
-};
-const defaultCvcNumber = "";
-const defaultCardBrand = "";
-const defaultPassword = "";
-const CardContext = reactExports.createContext(null);
-function CardProvider({ children }) {
-  const [cardNumbers, setCardNumbers] = reactExports.useState(defaultCardNumbers);
-  const [expirationPeriod, setExpirationPeriod] = reactExports.useState(
-    defaultExpirationPeriod
-  );
-  const [cvcNumber, setCvcNumber] = reactExports.useState(defaultCvcNumber);
-  const [cardBrand, setCardBrand] = reactExports.useState(defaultCardBrand);
-  const [password, setPassword] = reactExports.useState(defaultPassword);
-  const resetCard = () => {
-    setCardNumbers(defaultCardNumbers);
-    setCardBrand("");
-    setExpirationPeriod(defaultExpirationPeriod);
-    setCvcNumber("");
-    setPassword("");
-  };
-  const updateCardNumber = (value, position2) => {
-    setCardNumbers((prevNumbers) => ({
-      ...prevNumbers,
-      [position2]: value
-    }));
-  };
-  const updateExpirationPeriod = (value, position2) => {
-    setExpirationPeriod((prevExpirationPeriod) => ({
-      ...prevExpirationPeriod,
-      [position2]: value
-    }));
-  };
-  const updateCardBrand = (value) => {
-    setCardBrand(value);
-  };
-  const updatePassword = (value) => {
-    setPassword(value);
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    CardContext.Provider,
-    {
-      value: {
-        cardNumbers,
-        updateCardNumber,
-        expirationPeriod,
-        updateExpirationPeriod,
-        cvcNumber,
-        updateCvcNumber: setCvcNumber,
-        cardBrand,
-        updateCardBrand,
-        password,
-        updatePassword,
-        resetCard
-      },
-      children
-    }
-  );
-}
-const useCard = () => {
-  const context = reactExports.useContext(CardContext);
-  if (context === null) {
-    throw new Error("CardContext must be used within a CardProvider");
-  }
-  return context;
-};
-const InputGroupCSS = dt.div`
-  display: flex;
-  gap: 8px;
-`;
-const InputCSS = dt.input`
-  width: 100%;
-  height: 40px;
-  border-radius: 4px;
-  border: 1.01px solid ${({ theme: theme2 }) => theme2.colors.gray100};
-  padding: 0 8px;
-
-  ${(props) => props.$isError && lt`
-      border-color: ${({ theme: theme2 }) => theme2.colors.red};
-      &:focus {
-        outline: none;
-      }
-    `}
-`;
-function Input({ isError, ...rest }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(InputCSS, { $isError: isError, ...rest });
-}
-const cardNumberPlaceholder = MAGIC_NUMBER.placeholders.cardNumber;
-const maxLength$3 = MAGIC_NUMBER.maxLength.cardNumber;
-function CardNumberInputs({
-  cardNumbers,
-  error,
-  handleCardNumberChange
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Input,
-      {
-        placeholder: cardNumberPlaceholder,
-        maxLength: maxLength$3,
-        isError: error.cardNumbers.first,
-        value: cardNumbers.first,
-        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.first),
-        autoFocus: true
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Input,
-      {
-        placeholder: cardNumberPlaceholder,
-        maxLength: maxLength$3,
-        isError: error.cardNumbers.second,
-        value: cardNumbers.second,
-        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.second)
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Input,
-      {
-        placeholder: cardNumberPlaceholder,
-        maxLength: maxLength$3,
-        isError: error.cardNumbers.third,
-        value: cardNumbers.third,
-        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.third)
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Input,
-      {
-        placeholder: cardNumberPlaceholder,
-        maxLength: maxLength$3,
-        isError: error.cardNumbers.fourth,
-        value: cardNumbers.fourth,
-        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.fourth)
-      }
-    )
-  ] });
-}
-const month = MAGIC_NUMBER.placeholders.month;
-const year = MAGIC_NUMBER.placeholders.year;
-const maxLength$2 = MAGIC_NUMBER.maxLength.expirationPeriod;
-function ExpirationPeriodInputs({
-  expirationPeriod,
-  error,
-  handleExpirationPeriodChange
-}) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Input,
-      {
-        placeholder: month,
-        maxLength: maxLength$2,
-        isError: error.month,
-        value: expirationPeriod.month,
-        onChange: (e) => handleExpirationPeriodChange(e.target.value, PERIOD_POSITION.month),
-        autoFocus: true
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      Input,
-      {
-        placeholder: year,
-        maxLength: maxLength$2,
-        isError: error.year,
-        value: expirationPeriod.year,
-        onChange: (e) => handleExpirationPeriodChange(e.target.value, PERIOD_POSITION.year)
-      }
-    )
-  ] });
-}
-const placeholder = MAGIC_NUMBER.placeholders.cvcNumber;
-const maxLength$1 = MAGIC_NUMBER.maxLength.cvcNumber;
-function CvcInput({ value, error, handleCvcNumberChange }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Input,
-    {
-      placeholder,
-      maxLength: maxLength$1,
-      isError: error,
-      value,
-      onChange: (e) => handleCvcNumberChange(e.target.value),
-      autoFocus: true
-    }
-  );
-}
-const SelectCSS = dt.select`
-  width: 100%;
-  height: 40px;
-  padding: 0 5px;
-  border-radius: 5px;
-  cursor: pointer;
-`;
-function CardBrandInput({ value, handleCardBrandChange }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-    SelectCSS,
-    {
-      value,
-      onChange: (e) => handleCardBrandChange(e.target.value),
-      required: true,
-      children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", hidden: true, children: "카드사를 선택하세요" }),
-        CARD_COMPANIES.map((company) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: company, children: company }, company))
-      ]
-    }
-  );
-}
-const maxLength = MAGIC_NUMBER.maxLength.password;
-function PasswordInput({ value, error, handlePasswordChange }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(
-    Input,
-    {
-      type: "password",
-      maxLength,
-      isError: error,
-      value,
-      onChange: (e) => handlePasswordChange(e.target.value),
-      autoFocus: true
-    }
-  );
-}
-function InputFieldRenderer({
-  type,
-  error,
-  cardNumbers,
-  expirationPeriod,
-  cvcNumber,
-  cardBrand,
-  password,
-  handlers
-}) {
-  switch (type) {
-    case INPUT_TYPE.cardNumbers:
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
-        CardNumberInputs,
-        {
-          cardNumbers,
-          error,
-          handleCardNumberChange: handlers.handleCardNumberChange
-        }
-      );
-    case INPUT_TYPE.expirationPeriod:
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
-        ExpirationPeriodInputs,
-        {
-          expirationPeriod,
-          error: error.expirationPeriod,
-          handleExpirationPeriodChange: handlers.handleExpirationPeriodChange
-        }
-      );
-    case INPUT_TYPE.cvcNumber:
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
-        CvcInput,
-        {
-          value: cvcNumber,
-          error: error.cvcNumber,
-          handleCvcNumberChange: handlers.handleCvcNumberChange
-        }
-      );
-    case INPUT_TYPE.cardBrand:
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
-        CardBrandInput,
-        {
-          value: cardBrand,
-          handleCardBrandChange: handlers.handleCardBrandChange
-        }
-      );
-    case INPUT_TYPE.password:
-      return /* @__PURE__ */ jsxRuntimeExports.jsx(
-        PasswordInput,
-        {
-          value: password,
-          error: error.password,
-          handlePasswordChange: handlers.handlePasswordChange
-        }
-      );
-    default:
-      return null;
-  }
-}
-function InputGroup({
-  type,
-  error,
-  validateCardNumber,
-  validateExpirationPeriod,
-  validateCvcNumber,
-  validatePassword,
-  onComplete
-}) {
-  const {
-    cardNumbers,
-    updateCardNumber,
-    expirationPeriod,
-    updateExpirationPeriod,
-    cvcNumber,
-    updateCvcNumber,
-    cardBrand,
-    updateCardBrand,
-    password,
-    updatePassword
-  } = useCard();
-  const handleCardNumberChange = (value, position2) => {
-    validateCardNumber(value, position2);
-    updateCardNumber(value, position2);
-    onComplete(value, position2);
-  };
-  const handleExpirationPeriodChange = (value, position2) => {
-    validateExpirationPeriod(value, position2);
-    updateExpirationPeriod(value, position2);
-    onComplete(value, position2);
-  };
-  const handleCvcNumberChange = (value) => {
-    validateCvcNumber(value);
-    updateCvcNumber(value);
-    onComplete(value);
-  };
-  const handleCardBrandChange = (value) => {
-    updateCardBrand(value);
-    onComplete(value);
-  };
-  const handlePasswordChange = (value) => {
-    validatePassword(value);
-    updatePassword(value);
-    onComplete(value);
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroupCSS, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-    InputFieldRenderer,
-    {
-      type,
-      error,
-      cardNumbers,
-      expirationPeriod,
-      cvcNumber,
-      cardBrand,
-      password,
-      handlers: {
-        handleCardNumberChange,
-        handleExpirationPeriodChange,
-        handleCvcNumberChange,
-        handleCardBrandChange,
-        handlePasswordChange
-      }
-    }
-  ) });
-}
-const SubtitleCSS = dt.p`
-  margin: 0;
-  padding: 10px 0;
-`;
-function Subtitle({ subtitle }) {
-  return subtitle !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(SubtitleCSS, { children: subtitle });
-}
-const TitleCSS = dt.h2`
-  margin: 40px 0 0 0;
-`;
-function Title({ title }) {
-  return /* @__PURE__ */ jsxRuntimeExports.jsx(TitleCSS, { children: title });
-}
-const titleVariants = {
-  [INPUT_TYPE.cardNumbers]: "결제할 카드 번호를 입력해 주세요",
-  [INPUT_TYPE.expirationPeriod]: "카드 유효기간을 입력해 주세요",
-  [INPUT_TYPE.cvcNumber]: "CVC 번호를 입력해 주세요",
-  [INPUT_TYPE.cardBrand]: "카드사를 선택해 주세요",
-  [INPUT_TYPE.password]: "비밀번호를 입력해주세요"
-};
-const descriptionVariants = {
-  [INPUT_TYPE.cardNumbers]: "본인 명의의 카드만 결제 가능합니다.",
-  [INPUT_TYPE.expirationPeriod]: "월/년도(MMYY)를 순서대로 입력해 주세요.",
-  [INPUT_TYPE.cvcNumber]: null,
-  [INPUT_TYPE.cardBrand]: "현재 국내 카드사만 가능합니다.",
-  [INPUT_TYPE.password]: "앞의 2자리를 입력해주세요."
-};
-const subTitleVariants = {
-  [INPUT_TYPE.cardNumbers]: "카드 번호",
-  [INPUT_TYPE.expirationPeriod]: "유효기간",
-  [INPUT_TYPE.cvcNumber]: "CVC",
-  [INPUT_TYPE.cardBrand]: null,
-  [INPUT_TYPE.password]: "비밀번호 앞 2자리"
-};
-function InputSection({
-  type,
-  onComplete,
-  error,
-  validators
-}) {
-  const getErrorMessage = (type2) => {
-    if (type2 === INPUT_TYPE.cardNumbers) {
-      return Object.values(error.cardNumbers).find((message) => message !== null) || null;
-    }
-    if (type2 === INPUT_TYPE.expirationPeriod) {
-      return error.expirationPeriod.month || error.expirationPeriod.year || null;
-    }
-    if (type2 === INPUT_TYPE.cvcNumber) {
-      return error.cvcNumber || null;
-    }
-    if (type2 === INPUT_TYPE.password) {
-      return error.password || null;
-    }
-    if (type2 === INPUT_TYPE.cardBrand) {
-      return error.cardBrand || null;
-    }
-    return null;
-  };
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Title, { title: titleVariants[type] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Description, { description: descriptionVariants[type] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Subtitle, { subtitle: subTitleVariants[type] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      InputGroup,
-      {
-        type,
-        error,
-        validateCardNumber: validators.validateCardNumber,
-        validateExpirationPeriod: validators.validateExpirationPeriod,
-        validateCvcNumber: validators.validateCvcNumber,
-        validatePassword: validators.validatePassword,
-        onComplete
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Error$1, { errorMessage: getErrorMessage(type) })
-  ] });
-}
-const defaultIsComplete = {
-  cardNumbers: {
-    first: false,
-    second: false,
-    third: false,
-    fourth: false
-  },
-  cardBrand: false,
-  expirationPeriod: {
-    month: false,
-    year: false
-  },
-  cvcNumber: false,
-  password: false
-};
-function useCompletion() {
-  const [isComplete, setIsComplete] = reactExports.useState(defaultIsComplete);
-  const updateCardNumberIsComplete = (value, position2) => {
-    if (!position2) return;
-    setIsComplete((prev2) => ({
-      ...prev2,
-      cardNumbers: {
-        ...prev2.cardNumbers,
-        [position2]: value.length === 4
-      }
-    }));
-  };
-  const updateCardBrandIsComplete = (value) => {
-    setIsComplete((prev2) => ({
-      ...prev2,
-      cardBrand: value !== ""
-    }));
-  };
-  const updateExpirationPeriodIsComplete = (value, position2) => {
-    if (!position2) return;
-    setIsComplete((prev2) => ({
-      ...prev2,
-      expirationPeriod: {
-        ...prev2.expirationPeriod,
-        [position2]: value.length === 2
-      }
-    }));
-  };
-  const updateCvcIsComplete = (value) => {
-    setIsComplete((prev2) => ({
-      ...prev2,
-      cvcNumber: value.length === 3
-    }));
-  };
-  const updatePasswordIsComplete = (value) => {
-    setIsComplete((prev2) => ({
-      ...prev2,
-      password: value.length === 2
-    }));
-  };
-  return {
-    isComplete,
-    updateCardNumberIsComplete,
-    updateCardBrandIsComplete,
-    updateExpirationPeriodIsComplete,
-    updateCvcIsComplete,
-    updatePasswordIsComplete
-  };
-}
-const defaultError = {
-  cardNumbers: {
-    first: null,
-    second: null,
-    third: null,
-    fourth: null
-  },
-  expirationPeriod: {
-    month: null,
-    year: null
-  },
-  cvcNumber: null,
-  cardBrand: null,
-  password: null
-};
-const isInteger = (value) => Number.isInteger(Number(value));
-const isPositive = (value) => Number(value) >= 0;
-const isValidMonth = (value) => {
-  const num = Number(value);
-  return num >= 1 && num <= 12;
-};
-const isValidYear = (value) => {
-  const num = Number(value);
-  return num >= 25 && num <= 99;
-};
-function useInputError() {
-  const [error, setError] = reactExports.useState(defaultError);
-  const validateNumber = (value) => {
-    if (!isInteger(value)) return "숫자만 입력할 수 있습니다.";
-    if (!isPositive(value)) return "0 이상의 값을 입력해야 합니다.";
-    return null;
-  };
-  const validateCardNumber = (value, position2) => {
-    const message = validateNumber(value);
-    setError((prev2) => ({
-      ...prev2,
-      cardNumbers: {
-        ...prev2.cardNumbers,
-        [position2]: message
-      }
-    }));
-  };
-  const validateExpirationPeriod = (value, position2) => {
-    let message = validateNumber(value);
-    if (!message) {
-      if (position2 === "month" && !isValidMonth(value)) {
-        message = "1~12 사이의 월을 입력하세요.";
-      }
-      if (position2 === "year" && !isValidYear(value)) {
-        message = "25~99 사이의 연도를 입력하세요.";
-      }
-    }
-    setError((prev2) => ({
-      ...prev2,
-      expirationPeriod: {
-        ...prev2.expirationPeriod,
-        [position2]: message
-      }
-    }));
-  };
-  const validateCvcNumber = (value) => {
-    const message = validateNumber(value);
-    setError((prev2) => ({
-      ...prev2,
-      cvcNumber: message
-    }));
-  };
-  const validatePassword = (value) => {
-    const message = validateNumber(value);
-    setError((prev2) => ({
-      ...prev2,
-      password: message
-    }));
-  };
-  return {
-    error,
-    validators: {
-      validateCardNumber,
-      validateExpirationPeriod,
-      validateCvcNumber,
-      validatePassword
-    }
-  };
-}
 const PreviewContainerCSS = dt.div`
   width: 100%;
   height: 180px;
@@ -13968,27 +13533,38 @@ const PaymentsCSS = dt.div`
   justify-content: center;
   margin-bottom: 60px;
 `;
-function useVisibleSteps(isComplete) {
+function useVisibleSteps({
+  cardNumbers,
+  cardBrand,
+  expirationPeriod,
+  cvcNumber,
+  password
+}) {
   const [visible, setVisible] = reactExports.useState({
     cardBrand: false,
     expirationPeriod: false,
     cvcNumber: false,
     password: false
   });
+  const isCardNumberComplete = Object.values(cardNumbers).every(
+    (num) => num.length === MAGIC_NUMBER.maxLength.cardNumber
+  );
+  const isExpirationComplete = expirationPeriod.month.length === MAGIC_NUMBER.maxLength.expirationPeriod && expirationPeriod.year.length === MAGIC_NUMBER.maxLength.expirationPeriod;
+  const isCvcComplete = cvcNumber.length === MAGIC_NUMBER.maxLength.cvcNumber;
   reactExports.useEffect(() => {
-    if (Object.values(isComplete.cardNumbers).every(Boolean)) {
+    if (isCardNumberComplete) {
       setVisible((prev2) => ({ ...prev2, cardBrand: true }));
     }
-    if (isComplete.cardBrand) {
+    if (cardBrand) {
       setVisible((prev2) => ({ ...prev2, expirationPeriod: true }));
     }
-    if (Object.values(isComplete.expirationPeriod).every(Boolean)) {
+    if (isExpirationComplete) {
       setVisible((prev2) => ({ ...prev2, cvcNumber: true }));
     }
-    if (isComplete.cvcNumber) {
+    if (isCvcComplete) {
       setVisible((prev2) => ({ ...prev2, password: true }));
     }
-  }, [isComplete]);
+  }, [cardNumbers, cardBrand, expirationPeriod, cvcNumber, password]);
   return visible;
 }
 const ButtonCSS = dt.button`
@@ -14360,12 +13936,12 @@ function getUrlBasedHistory(getLocation, createHref2, validateLocation, options 
   };
   return history;
 }
-function matchRoutes(routes, locationArg, basename = "/") {
-  return matchRoutesImpl(routes, locationArg, basename, false);
+function matchRoutes(routes, locationArg, basename2 = "/") {
+  return matchRoutesImpl(routes, locationArg, basename2, false);
 }
-function matchRoutesImpl(routes, locationArg, basename, allowPartial) {
+function matchRoutesImpl(routes, locationArg, basename2, allowPartial) {
   let location = typeof locationArg === "string" ? parsePath(locationArg) : locationArg;
-  let pathname = stripBasename(location.pathname || "/", basename);
+  let pathname = stripBasename(location.pathname || "/", basename2);
   if (pathname == null) {
     return null;
   }
@@ -14610,12 +14186,12 @@ function decodePath(value) {
     return value;
   }
 }
-function stripBasename(pathname, basename) {
-  if (basename === "/") return pathname;
-  if (!pathname.toLowerCase().startsWith(basename.toLowerCase())) {
+function stripBasename(pathname, basename2) {
+  if (basename2 === "/") return pathname;
+  if (!pathname.toLowerCase().startsWith(basename2.toLowerCase())) {
     return null;
   }
-  let startIndex = basename.endsWith("/") ? basename.length - 1 : basename.length;
+  let startIndex = basename2.endsWith("/") ? basename2.length - 1 : basename2.length;
   let nextChar = pathname.charAt(startIndex);
   if (nextChar && nextChar !== "/") {
     return null;
@@ -14765,11 +14341,11 @@ function useHref(to, { relative } = {}) {
     // router loaded. We can help them understand how to avoid that.
     `useHref() may be used only in the context of a <Router> component.`
   );
-  let { basename, navigator: navigator2 } = reactExports.useContext(NavigationContext);
+  let { basename: basename2, navigator: navigator2 } = reactExports.useContext(NavigationContext);
   let { hash: hash2, pathname, search } = useResolvedPath(to, { relative });
   let joinedPathname = pathname;
-  if (basename !== "/") {
-    joinedPathname = pathname === "/" ? basename : joinPaths([basename, pathname]);
+  if (basename2 !== "/") {
+    joinedPathname = pathname === "/" ? basename2 : joinPaths([basename2, pathname]);
   }
   return navigator2.createHref({ pathname: joinedPathname, search, hash: hash2 });
 }
@@ -14804,7 +14380,7 @@ function useNavigateUnstable() {
     `useNavigate() may be used only in the context of a <Router> component.`
   );
   let dataRouterContext = reactExports.useContext(DataRouterContext);
-  let { basename, navigator: navigator2 } = reactExports.useContext(NavigationContext);
+  let { basename: basename2, navigator: navigator2 } = reactExports.useContext(NavigationContext);
   let { matches } = reactExports.useContext(RouteContext);
   let { pathname: locationPathname } = useLocation();
   let routePathnamesJson = JSON.stringify(getResolveToMatches(matches));
@@ -14826,8 +14402,8 @@ function useNavigateUnstable() {
         locationPathname,
         options.relative === "path"
       );
-      if (dataRouterContext == null && basename !== "/") {
-        path.pathname = path.pathname === "/" ? basename : joinPaths([basename, path.pathname]);
+      if (dataRouterContext == null && basename2 !== "/") {
+        path.pathname = path.pathname === "/" ? basename2 : joinPaths([basename2, path.pathname]);
       }
       (!!options.replace ? navigator2.replace : navigator2.push)(
         path,
@@ -14836,7 +14412,7 @@ function useNavigateUnstable() {
       );
     },
     [
-      basename,
+      basename2,
       navigator2,
       routePathnamesJson,
       locationPathname,
@@ -15253,15 +14829,15 @@ function Router({
     !useInRouterContext(),
     `You cannot render a <Router> inside another <Router>. You should never have more than one in your app.`
   );
-  let basename = basenameProp.replace(/^\/*/, "/");
+  let basename2 = basenameProp.replace(/^\/*/, "/");
   let navigationContext = reactExports.useMemo(
     () => ({
-      basename,
+      basename: basename2,
       navigator: navigator2,
       static: staticProp,
       future: {}
     }),
-    [basename, navigator2, staticProp]
+    [basename2, navigator2, staticProp]
   );
   if (typeof locationProp === "string") {
     locationProp = parsePath(locationProp);
@@ -15274,7 +14850,7 @@ function Router({
     key = "default"
   } = locationProp;
   let locationContext = reactExports.useMemo(() => {
-    let trailingPathname = stripBasename(pathname, basename);
+    let trailingPathname = stripBasename(pathname, basename2);
     if (trailingPathname == null) {
       return null;
     }
@@ -15288,10 +14864,10 @@ function Router({
       },
       navigationType
     };
-  }, [basename, pathname, search, hash2, state, key, navigationType]);
+  }, [basename2, pathname, search, hash2, state, key, navigationType]);
   warning(
     locationContext != null,
-    `<Router basename="${basename}"> is not able to match the URL "${pathname}${search}${hash2}" because it does not start with the basename, so the <Router> won't render anything.`
+    `<Router basename="${basename2}"> is not able to match the URL "${pathname}${search}${hash2}" because it does not start with the basename, so the <Router> won't render anything.`
   );
   if (locationContext == null) {
     return null;
@@ -15407,7 +14983,7 @@ function getFormEncType(encType) {
   }
   return encType;
 }
-function getFormSubmissionInfo(target, basename) {
+function getFormSubmissionInfo(target, basename2) {
   let method;
   let action;
   let encType;
@@ -15415,7 +14991,7 @@ function getFormSubmissionInfo(target, basename) {
   let body;
   if (isFormElement(target)) {
     let attr = target.getAttribute("action");
-    action = attr ? stripBasename(attr, basename) : null;
+    action = attr ? stripBasename(attr, basename2) : null;
     method = target.getAttribute("method") || defaultMethod;
     encType = getFormEncType(target.getAttribute("enctype")) || defaultEncType;
     formData = new FormData(target);
@@ -15427,7 +15003,7 @@ function getFormSubmissionInfo(target, basename) {
       );
     }
     let attr = target.getAttribute("formaction") || form.getAttribute("action");
-    action = attr ? stripBasename(attr, basename) : null;
+    action = attr ? stripBasename(attr, basename2) : null;
     method = target.getAttribute("formmethod") || form.getAttribute("method") || defaultMethod;
     encType = getFormEncType(target.getAttribute("formenctype")) || getFormEncType(form.getAttribute("enctype")) || defaultEncType;
     formData = new FormData(form, target);
@@ -15607,7 +15183,7 @@ function dedupeLinkDescriptors(descriptors, preloads) {
   }, []);
 }
 var NO_BODY_STATUS_CODES = /* @__PURE__ */ new Set([100, 101, 204, 205]);
-function singleFetchUrl(reqUrl, basename) {
+function singleFetchUrl(reqUrl, basename2) {
   let url = typeof reqUrl === "string" ? new URL(
     reqUrl,
     // This can be called during the SSR flow via PrefetchPageLinksImpl so
@@ -15616,8 +15192,8 @@ function singleFetchUrl(reqUrl, basename) {
   ) : reqUrl;
   if (url.pathname === "/") {
     url.pathname = "_root.data";
-  } else if (basename && stripBasename(url.pathname, basename) === "/") {
-    url.pathname = `${basename.replace(/\/$/, "")}/_root.data`;
+  } else if (basename2 && stripBasename(url.pathname, basename2) === "/") {
+    url.pathname = `${basename2.replace(/\/$/, "")}/_root.data`;
   } else {
     url.pathname = `${url.pathname.replace(/\/$/, "")}.data`;
   }
@@ -15754,7 +15330,7 @@ function PrefetchPageLinksImpl({
 }) {
   let location = useLocation();
   let { manifest, routeModules } = useFrameworkContext();
-  let { basename } = useDataRouterContext2();
+  let { basename: basename2 } = useDataRouterContext2();
   let { loaderData, matches } = useDataRouterStateContext();
   let newMatchesForData = reactExports.useMemo(
     () => getNewMatchesForLinks(
@@ -15801,7 +15377,7 @@ function PrefetchPageLinksImpl({
     if (routesParams.size === 0) {
       return [];
     }
-    let url = singleFetchUrl(page, basename);
+    let url = singleFetchUrl(page, basename2);
     if (foundOptOutRoute && routesParams.size > 0) {
       url.searchParams.set(
         "_routes",
@@ -15810,7 +15386,7 @@ function PrefetchPageLinksImpl({
     }
     return [url.pathname + url.search];
   }, [
-    basename,
+    basename2,
     loaderData,
     location,
     manifest,
@@ -15849,7 +15425,7 @@ try {
 } catch (e) {
 }
 function BrowserRouter({
-  basename,
+  basename: basename2,
   children,
   window: window2
 }) {
@@ -15872,7 +15448,7 @@ function BrowserRouter({
   return /* @__PURE__ */ reactExports.createElement(
     Router,
     {
-      basename,
+      basename: basename2,
       children,
       location: state.location,
       navigationType: state.action,
@@ -15896,7 +15472,7 @@ var Link = reactExports.forwardRef(
     viewTransition,
     ...rest
   }, forwardedRef) {
-    let { basename } = reactExports.useContext(NavigationContext);
+    let { basename: basename2 } = reactExports.useContext(NavigationContext);
     let isAbsolute = typeof to === "string" && ABSOLUTE_URL_REGEX2.test(to);
     let absoluteHref;
     let isExternal = false;
@@ -15906,7 +15482,7 @@ var Link = reactExports.forwardRef(
         try {
           let currentUrl = new URL(window.location.href);
           let targetUrl = to.startsWith("//") ? new URL(currentUrl.protocol + to) : new URL(to);
-          let path = stripBasename(targetUrl.pathname, basename);
+          let path = stripBasename(targetUrl.pathname, basename2);
           if (targetUrl.origin === currentUrl.origin && path != null) {
             to = path + targetUrl.search + targetUrl.hash;
           } else {
@@ -15973,7 +15549,7 @@ var NavLink = reactExports.forwardRef(
     let path = useResolvedPath(to, { relative: rest.relative });
     let location = useLocation();
     let routerState = reactExports.useContext(DataRouterStateContext);
-    let { navigator: navigator2, basename } = reactExports.useContext(NavigationContext);
+    let { navigator: navigator2, basename: basename2 } = reactExports.useContext(NavigationContext);
     let isTransitioning = routerState != null && // Conditional usage is OK here because the usage of a data router is static
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useViewTransitionState(path) && viewTransition === true;
@@ -15985,8 +15561,8 @@ var NavLink = reactExports.forwardRef(
       nextLocationPathname = nextLocationPathname ? nextLocationPathname.toLowerCase() : null;
       toPathname = toPathname.toLowerCase();
     }
-    if (nextLocationPathname && basename) {
-      nextLocationPathname = stripBasename(nextLocationPathname, basename) || nextLocationPathname;
+    if (nextLocationPathname && basename2) {
+      nextLocationPathname = stripBasename(nextLocationPathname, basename2) || nextLocationPathname;
     }
     const endSlashPosition = toPathname !== "/" && toPathname.endsWith("/") ? toPathname.length - 1 : toPathname.length;
     let isActive = locationPathname === toPathname || !end && locationPathname.startsWith(toPathname) && locationPathname.charAt(endSlashPosition) === "/";
@@ -16130,13 +15706,13 @@ function useSubmit() {
     "useSubmit"
     /* UseSubmit */
   );
-  let { basename } = reactExports.useContext(NavigationContext);
+  let { basename: basename2 } = reactExports.useContext(NavigationContext);
   let currentRouteId = useRouteId();
   return reactExports.useCallback(
     async (target, options = {}) => {
       let { action, method, encType, formData, body } = getFormSubmissionInfo(
         target,
-        basename
+        basename2
       );
       if (options.navigate === false) {
         let key = options.fetcherKey || getUniqueFetcherId();
@@ -16163,11 +15739,11 @@ function useSubmit() {
         });
       }
     },
-    [router, basename, currentRouteId]
+    [router, basename2, currentRouteId]
   );
 }
 function useFormAction(action, { relative } = {}) {
-  let { basename } = reactExports.useContext(NavigationContext);
+  let { basename: basename2 } = reactExports.useContext(NavigationContext);
   let routeContext = reactExports.useContext(RouteContext);
   invariant(routeContext, "useFormAction must be used inside a RouteContext");
   let [match2] = routeContext.matches.slice(-1);
@@ -16188,8 +15764,8 @@ function useFormAction(action, { relative } = {}) {
   if ((!action || action === ".") && match2.route.index) {
     path.search = path.search ? path.search.replace(/^\?/, "?index&") : "?index";
   }
-  if (basename !== "/") {
-    path.pathname = path.pathname === "/" ? basename : joinPaths([basename, path.pathname]);
+  if (basename2 !== "/") {
+    path.pathname = path.pathname === "/" ? basename2 : joinPaths([basename2, path.pathname]);
   }
   return createPath(path);
 }
@@ -16199,7 +15775,7 @@ function useViewTransitionState(to, opts = {}) {
     vtContext != null,
     "`useViewTransitionState` must be used within `react-router-dom`'s `RouterProvider`.  Did you accidentally import `RouterProvider` from `react-router`?"
   );
-  let { basename } = useDataRouterContext3(
+  let { basename: basename2 } = useDataRouterContext3(
     "useViewTransitionState"
     /* useViewTransitionState */
   );
@@ -16207,8 +15783,8 @@ function useViewTransitionState(to, opts = {}) {
   if (!vtContext.isTransitioning) {
     return false;
   }
-  let currentPath = stripBasename(vtContext.currentLocation.pathname, basename) || vtContext.currentLocation.pathname;
-  let nextPath = stripBasename(vtContext.nextLocation.pathname, basename) || vtContext.nextLocation.pathname;
+  let currentPath = stripBasename(vtContext.currentLocation.pathname, basename2) || vtContext.currentLocation.pathname;
+  let nextPath = stripBasename(vtContext.nextLocation.pathname, basename2) || vtContext.nextLocation.pathname;
   return matchPath(path.pathname, nextPath) != null || matchPath(path.pathname, currentPath) != null;
 }
 new TextEncoder();
@@ -16216,21 +15792,382 @@ new TextEncoder();
   ...NO_BODY_STATUS_CODES,
   304
 ]);
-function Payments() {
+const DescriptionCSS = dt.p`
+  font-size: ${({ theme: theme2 }) => theme2.fontSize.small};
+  color: ${({ theme: theme2 }) => theme2.colors.gray};
+  margin: 0;
+  padding: 10px 0;
+`;
+function Description({ description }) {
+  return description !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(DescriptionCSS, { children: description });
+}
+const ErrorCSS = dt.p`
+  font-size: ${({ theme: theme2 }) => theme2.fontSize.small};
+  color: ${({ theme: theme2 }) => theme2.colors.red};
+`;
+function Error$1({ errorMessage }) {
+  return errorMessage !== "" && /* @__PURE__ */ jsxRuntimeExports.jsx(ErrorCSS, { children: errorMessage });
+}
+const InputGroupCSS = dt.div`
+  display: flex;
+  gap: 8px;
+`;
+const InputCSS = dt.input`
+  width: 100%;
+  height: 40px;
+  border-radius: 4px;
+  border: 1.01px solid ${({ theme: theme2 }) => theme2.colors.gray100};
+  padding: 0 8px;
+
+  ${(props) => props.$isError && lt`
+      border-color: ${({ theme: theme2 }) => theme2.colors.red};
+      &:focus {
+        outline: none;
+      }
+    `}
+`;
+function Input({ isError, ...rest }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(InputCSS, { $isError: isError, ...rest });
+}
+const cardNumberPlaceholder = MAGIC_NUMBER.placeholders.cardNumber;
+const maxLength$3 = MAGIC_NUMBER.maxLength.cardNumber;
+function CardNumberInputs({
+  cardNumbers,
+  error,
+  handleCardNumberChange
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: cardNumberPlaceholder,
+        maxLength: maxLength$3,
+        isError: error.cardNumbers.first,
+        value: cardNumbers.first,
+        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.first),
+        autoFocus: true
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: cardNumberPlaceholder,
+        maxLength: maxLength$3,
+        isError: error.cardNumbers.second,
+        value: cardNumbers.second,
+        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.second)
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: cardNumberPlaceholder,
+        maxLength: maxLength$3,
+        isError: error.cardNumbers.third,
+        value: cardNumbers.third,
+        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.third)
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: cardNumberPlaceholder,
+        maxLength: maxLength$3,
+        isError: error.cardNumbers.fourth,
+        value: cardNumbers.fourth,
+        onChange: (e) => handleCardNumberChange(e.target.value, CARD_POSITION.fourth)
+      }
+    )
+  ] });
+}
+const month = MAGIC_NUMBER.placeholders.month;
+const year = MAGIC_NUMBER.placeholders.year;
+const maxLength$2 = MAGIC_NUMBER.maxLength.expirationPeriod;
+function ExpirationPeriodInputs({
+  expirationPeriod,
+  error,
+  handleExpirationPeriodChange
+}) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: month,
+        maxLength: maxLength$2,
+        isError: error.month,
+        value: expirationPeriod.month,
+        onChange: (e) => handleExpirationPeriodChange(e.target.value, PERIOD_POSITION.month),
+        autoFocus: true
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Input,
+      {
+        placeholder: year,
+        maxLength: maxLength$2,
+        isError: error.year,
+        value: expirationPeriod.year,
+        onChange: (e) => handleExpirationPeriodChange(e.target.value, PERIOD_POSITION.year)
+      }
+    )
+  ] });
+}
+const placeholder = MAGIC_NUMBER.placeholders.cvcNumber;
+const maxLength$1 = MAGIC_NUMBER.maxLength.cvcNumber;
+function CvcInput({ value, error, handleCvcNumberChange }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Input,
+    {
+      placeholder,
+      maxLength: maxLength$1,
+      isError: error,
+      value,
+      onChange: (e) => handleCvcNumberChange(e.target.value),
+      autoFocus: true
+    }
+  );
+}
+const SelectCSS = dt.select`
+  width: 100%;
+  height: 40px;
+  padding: 0 5px;
+  border-radius: 5px;
+  cursor: pointer;
+`;
+function CardBrandInput({ value, handleCardBrandChange }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+    SelectCSS,
+    {
+      value,
+      onChange: (e) => handleCardBrandChange(e.target.value),
+      required: true,
+      children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", hidden: true, children: "카드사를 선택하세요" }),
+        CARD_COMPANIES.map((company) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: company, children: company }, company))
+      ]
+    }
+  );
+}
+const maxLength = MAGIC_NUMBER.maxLength.password;
+function PasswordInput({ value, error, handlePasswordChange }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    Input,
+    {
+      type: "password",
+      maxLength,
+      isError: error,
+      value,
+      onChange: (e) => handlePasswordChange(e.target.value),
+      autoFocus: true
+    }
+  );
+}
+function InputFieldRenderer({
+  type,
+  error,
+  cardNumbers,
+  expirationPeriod,
+  cvcNumber,
+  cardBrand,
+  password,
+  handlers
+}) {
+  switch (type) {
+    case INPUT_TYPE.cardNumbers:
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        CardNumberInputs,
+        {
+          cardNumbers,
+          error,
+          handleCardNumberChange: handlers.handleCardNumberChange
+        }
+      );
+    case INPUT_TYPE.expirationPeriod:
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ExpirationPeriodInputs,
+        {
+          expirationPeriod,
+          error: error.expirationPeriod,
+          handleExpirationPeriodChange: handlers.handleExpirationPeriodChange
+        }
+      );
+    case INPUT_TYPE.cvcNumber:
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        CvcInput,
+        {
+          value: cvcNumber,
+          error: error.cvcNumber,
+          handleCvcNumberChange: handlers.handleCvcNumberChange
+        }
+      );
+    case INPUT_TYPE.cardBrand:
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        CardBrandInput,
+        {
+          value: cardBrand,
+          handleCardBrandChange: handlers.handleCardBrandChange
+        }
+      );
+    case INPUT_TYPE.password:
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(
+        PasswordInput,
+        {
+          value: password,
+          error: error.password,
+          handlePasswordChange: handlers.handlePasswordChange
+        }
+      );
+    default:
+      return null;
+  }
+}
+function InputGroup({
+  type,
+  error,
+  validateCardNumber,
+  validateExpirationPeriod,
+  validateCvcNumber,
+  validatePassword
+}) {
   const {
-    isComplete,
-    updateCardNumberIsComplete,
-    updateCardBrandIsComplete,
-    updateExpirationPeriodIsComplete,
-    updateCvcIsComplete,
-    updatePasswordIsComplete
-  } = useCompletion();
-  const visible = useVisibleSteps(isComplete);
+    cardNumbers,
+    updateCardNumber,
+    expirationPeriod,
+    updateExpirationPeriod,
+    cvcNumber,
+    updateCvcNumber,
+    cardBrand,
+    updateCardBrand,
+    password,
+    updatePassword
+  } = useCard();
+  const handleCardNumberChange = (value, position2) => {
+    validateCardNumber(value, position2);
+    updateCardNumber(value, position2);
+  };
+  const handleExpirationPeriodChange = (value, position2) => {
+    validateExpirationPeriod(value, position2);
+    updateExpirationPeriod(value, position2);
+  };
+  const handleCvcNumberChange = (value) => {
+    validateCvcNumber(value);
+    updateCvcNumber(value);
+  };
+  const handleCardBrandChange = (value) => {
+    updateCardBrand(value);
+  };
+  const handlePasswordChange = (value) => {
+    validatePassword(value);
+    updatePassword(value);
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(InputGroupCSS, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+    InputFieldRenderer,
+    {
+      type,
+      error,
+      cardNumbers,
+      expirationPeriod,
+      cvcNumber,
+      cardBrand,
+      password,
+      handlers: {
+        handleCardNumberChange,
+        handleExpirationPeriodChange,
+        handleCvcNumberChange,
+        handleCardBrandChange,
+        handlePasswordChange
+      }
+    }
+  ) });
+}
+const SubtitleCSS = dt.p`
+  margin: 0;
+  padding: 10px 0;
+`;
+function Subtitle({ subtitle }) {
+  return subtitle !== null && /* @__PURE__ */ jsxRuntimeExports.jsx(SubtitleCSS, { children: subtitle });
+}
+const TitleCSS = dt.h2`
+  margin: 40px 0 0 0;
+`;
+function Title({ title }) {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(TitleCSS, { children: title });
+}
+const titleVariants = {
+  [INPUT_TYPE.cardNumbers]: "결제할 카드 번호를 입력해 주세요",
+  [INPUT_TYPE.expirationPeriod]: "카드 유효기간을 입력해 주세요",
+  [INPUT_TYPE.cvcNumber]: "CVC 번호를 입력해 주세요",
+  [INPUT_TYPE.cardBrand]: "카드사를 선택해 주세요",
+  [INPUT_TYPE.password]: "비밀번호를 입력해주세요"
+};
+const descriptionVariants = {
+  [INPUT_TYPE.cardNumbers]: "본인 명의의 카드만 결제 가능합니다.",
+  [INPUT_TYPE.expirationPeriod]: "월/년도(MMYY)를 순서대로 입력해 주세요.",
+  [INPUT_TYPE.cvcNumber]: null,
+  [INPUT_TYPE.cardBrand]: "현재 국내 카드사만 가능합니다.",
+  [INPUT_TYPE.password]: "앞의 2자리를 입력해주세요."
+};
+const subTitleVariants = {
+  [INPUT_TYPE.cardNumbers]: "카드 번호",
+  [INPUT_TYPE.expirationPeriod]: "유효기간",
+  [INPUT_TYPE.cvcNumber]: "CVC",
+  [INPUT_TYPE.cardBrand]: null,
+  [INPUT_TYPE.password]: "비밀번호 앞 2자리"
+};
+function InputSection({ type, error, validators }) {
+  const getErrorMessage = (type2) => {
+    if (type2 === INPUT_TYPE.cardNumbers) {
+      return Object.values(error.cardNumbers).find((message) => message !== null) || null;
+    }
+    if (type2 === INPUT_TYPE.expirationPeriod) {
+      return error.expirationPeriod.month || error.expirationPeriod.year || null;
+    }
+    if (type2 === INPUT_TYPE.cvcNumber) {
+      return error.cvcNumber || null;
+    }
+    if (type2 === INPUT_TYPE.password) {
+      return error.password || null;
+    }
+    if (type2 === INPUT_TYPE.cardBrand) {
+      return error.cardBrand || null;
+    }
+    return null;
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Title, { title: titleVariants[type] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Description, { description: descriptionVariants[type] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Subtitle, { subtitle: subTitleVariants[type] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      InputGroup,
+      {
+        type,
+        error,
+        validateCardNumber: validators.validateCardNumber,
+        validateExpirationPeriod: validators.validateExpirationPeriod,
+        validateCvcNumber: validators.validateCvcNumber,
+        validatePassword: validators.validatePassword
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Error$1, { errorMessage: getErrorMessage(type) })
+  ] });
+}
+function Payments() {
   const { error, validators } = useInputError();
+  const { cardNumbers, cardBrand, expirationPeriod, cvcNumber, password } = useCard();
+  const visible = useVisibleSteps({
+    cardNumbers,
+    cardBrand,
+    expirationPeriod,
+    cvcNumber,
+    password
+  });
   const navigate = useNavigate();
-  const { cardNumbers, cardBrand } = useCard();
   const isButtonShowing = reactExports.useMemo(() => {
-    const isAllComplete = Object.values(isComplete.cardNumbers).every(Boolean) && isComplete.cardBrand && Object.values(isComplete.expirationPeriod).every(Boolean) && isComplete.cvcNumber && isComplete.password;
+    const isAllComplete = Object.values(cardNumbers).every(
+      (num) => num.length === MAGIC_NUMBER.maxLength.cardNumber
+    ) && cardBrand !== "" && Object.values(expirationPeriod).every(
+      (val) => val.length === MAGIC_NUMBER.maxLength.expirationPeriod
+    ) && cvcNumber.length === MAGIC_NUMBER.maxLength.cvcNumber && password.length === MAGIC_NUMBER.maxLength.password;
     const isAllErrorFree = [
       ...Object.values(error.cardNumbers),
       ...Object.values(error.expirationPeriod),
@@ -16239,8 +16176,7 @@ function Payments() {
       error.password
     ].every((v2) => v2 === null);
     return isAllComplete && isAllErrorFree;
-  }, [isComplete, error]);
-  const showButton = isButtonShowing;
+  }, [cardNumbers, cardBrand, expirationPeriod, cvcNumber, password, error]);
   const handleClick = () => {
     navigate("/success", {
       state: {
@@ -16256,7 +16192,6 @@ function Payments() {
         InputSection,
         {
           type: INPUT_TYPE.password,
-          onComplete: updatePasswordIsComplete,
           error,
           validators
         }
@@ -16265,7 +16200,6 @@ function Payments() {
         InputSection,
         {
           type: INPUT_TYPE.cvcNumber,
-          onComplete: updateCvcIsComplete,
           error,
           validators
         }
@@ -16274,7 +16208,6 @@ function Payments() {
         InputSection,
         {
           type: INPUT_TYPE.expirationPeriod,
-          onComplete: updateExpirationPeriodIsComplete,
           error,
           validators
         }
@@ -16283,7 +16216,6 @@ function Payments() {
         InputSection,
         {
           type: INPUT_TYPE.cardBrand,
-          onComplete: updateCardBrandIsComplete,
           error,
           validators
         }
@@ -16292,12 +16224,11 @@ function Payments() {
         InputSection,
         {
           type: INPUT_TYPE.cardNumbers,
-          onComplete: updateCardNumberIsComplete,
           error,
           validators
         }
       ),
-      showButton && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "home", onClick: handleClick })
+      isButtonShowing && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { onClick: handleClick, variant: "home" })
     ] })
   ] });
 }
@@ -16364,8 +16295,9 @@ function Success() {
     /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "success", onClick: handleClick })
   ] }) });
 }
+const basename = "/react-payments";
 ReactDOM.createRoot(document.getElementById("root")).render(
-  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ot, { theme, children: /* @__PURE__ */ jsxRuntimeExports.jsx(BrowserRouter, { basename: "/react-payments", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Routes, { children: [
+  /* @__PURE__ */ jsxRuntimeExports.jsx(React.StrictMode, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(ot, { theme, children: /* @__PURE__ */ jsxRuntimeExports.jsx(BrowserRouter, { basename, children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardProvider, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Routes, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Payments, {}) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Route, { path: "/success", element: /* @__PURE__ */ jsxRuntimeExports.jsx(Success, {}) })
   ] }) }) }) }) })
